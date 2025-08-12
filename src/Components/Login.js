@@ -1,12 +1,23 @@
 import Header from "./Header";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { checkValidData } from "../utils/validate";
 
 const Login = () => {
-const [isSignInForm, setIsSignInForm] = useState(true)
+  const [isSignInForm, setIsSignInForm] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-    const toggleSignInForm =()=>{
-    setIsSignInForm(!isSignInForm)
-    }
+  const email = useRef(null);
+  const password = useRef(null);
+
+  const handleButtonClick = () => {
+    const message = checkValidData(email.current.value, password.current.value);
+    setErrorMessage(message);
+  };
+
+  const toggleSignInForm = () => {
+    setIsSignInForm(!isSignInForm);
+  };
+
   return (
     <div className="h-screen ">
       <Header />
@@ -21,14 +32,45 @@ const [isSignInForm, setIsSignInForm] = useState(true)
 
       <div className="absolute top-0 left-0 w-full h-[855px] bg-black opacity-55 z-0"></div>
 
-      <form className="rounded absolute w-3/12 p-12 bg-black mt-[180px] mx-auto left-0 right-0 text-white bg-opacity-70">
-      <h1 className="text-3xl my-2 font-bold">{isSignInForm? "Sign In" : "Sign Up"}</h1>
-        <input type="text" placeholder="Email Address" className="p-2 my-3 w-full bg-transparent border border-white rounded" />
-        <input type="password" placeholder="Password" className="p-2 my-3 w-full bg-transparent border border-white rounded" />
-        <button className="py-2 px-3 my-5 w-full rounded bg-red-700">{isSignInForm? "Sign In" : "Sign Up"}</button>
-        <p className="py-4 cursor-pointer" onClick={toggleSignInForm}>{isSignInForm? "New to Netflix? Sign Up Now" : "Already Registered? Sign In Here."}</p>
+      <form onSubmit={(e)=> e.preventDefault()} className="rounded absolute w-3/12 p-12 bg-black mt-[165px] mx-auto left-0 right-0 text-white bg-opacity-70">
+        <h1 className="text-3xl my-2 font-bold">
+          {isSignInForm ? "Sign In" : "Sign Up"}
+        </h1>
+        {!isSignInForm && (
+          <input
+            type="text"
+            placeholder="Your Full Name"
+            className="p-2 my-3 w-full bg-transparent border border-white rounded"
+          />
+        )}
+        <input
+        ref={email}
+          type="text"
+          placeholder="Email Address"
+          className="p-2 my-3 w-full bg-transparent border border-white rounded"
+        />
+        <input
+        ref={password}
+          type="password"
+          placeholder="Password"
+          className="p-2 my-3 w-full bg-transparent border border-white rounded"
+        />
+        <p className="text-red-700 font-bold pb-1">{errorMessage}</p>
+        <button
+          className="py-2 px-3 my-5 w-full rounded bg-red-700"
+          onClick={handleButtonClick}
+        >
+          {isSignInForm ? "Sign In" : "Sign Up"}
+        </button>
+        <p
+          className="py-4 cursor-pointer hover:underline"
+          onClick={toggleSignInForm}
+        >
+          {isSignInForm
+            ? "New to Netflix? Sign Up Now"
+            : "Already Registered? Sign In Here."}
+        </p>
       </form>
-
     </div>
   );
 };
