@@ -1,6 +1,8 @@
 import Header from "./Header";
 import { useRef, useState } from "react";
 import { checkValidData } from "../utils/validate";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/Firebase";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
@@ -12,6 +14,37 @@ const Login = () => {
   const handleButtonClick = () => {
     const message = checkValidData(email.current.value, password.current.value);
     setErrorMessage(message);
+    if (message) return;
+
+    if (!isSignInForm) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    } else {
+      signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user)
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage) 
+        });
+    }
   };
 
   const toggleSignInForm = () => {
@@ -32,7 +65,10 @@ const Login = () => {
 
       <div className="absolute top-0 left-0 w-full h-[855px] bg-black opacity-55 z-0"></div>
 
-      <form onSubmit={(e)=> e.preventDefault()} className="rounded absolute w-3/12 p-12 bg-black mt-[165px] mx-auto left-0 right-0 text-white bg-opacity-70">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="rounded absolute w-3/12 p-12 bg-black mt-[165px] mx-auto left-0 right-0 text-white bg-opacity-70"
+      >
         <h1 className="text-3xl my-2 font-bold">
           {isSignInForm ? "Sign In" : "Sign Up"}
         </h1>
@@ -44,13 +80,13 @@ const Login = () => {
           />
         )}
         <input
-        ref={email}
+          ref={email}
           type="text"
           placeholder="Email Address"
           className="p-2 my-3 w-full bg-transparent border border-white rounded"
         />
         <input
-        ref={password}
+          ref={password}
           type="password"
           placeholder="Password"
           className="p-2 my-3 w-full bg-transparent border border-white rounded"
